@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="SafeVault.AppHost/SafeVault.AppHost.csproj" Id="3d590bf3-c27e-4100-86ea-20a40a2a9b48" />
+  <Project Path="SafeVault.ServiceDefaults/SafeVault.ServiceDefaults.csproj" />
+  <Project Path="SafeVault.Test/SafeVault.Test.csproj" Id="f32b41fb-1c3a-4bf0-a59a-eeaf5bca2176" />
+  <Project Path="SafeVault/SafeVault.csproj" />
+</Solution>
