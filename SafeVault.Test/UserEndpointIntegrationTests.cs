@@ -1,12 +1,11 @@
 ﻿using SafeVault.Models;
 using System.Net;
 using System.Net.Http.Json;
-using Xunit;
 
 namespace SafeVault.Test;
 
-public class UserEndpointsMySqlIntegrationTests(MySqlTestApplicationFactory factory) :
-    IClassFixture<MySqlTestApplicationFactory>
+public class UserEndpointsMySqlIntegrationTests(SqlServerTestApplicationFactory factory) :
+    IClassFixture<SqlServerTestApplicationFactory>
 {
     private readonly HttpClient _client = factory.CreateClient();
 

@@ -1,50 +1,54 @@
-﻿using MySqlConnector;
+﻿using Microsoft.Data.SqlClient;
 
 namespace SafeVault.Services;
 
-public class UserService(MySqlDataSource mySqlDataSource) : IUserService
+public class UserService(SqlConnection dataSource) : IUserService
 {
     public async Task SaveUserAsync(CreateUserRequest request, CancellationToken ct)
     {
-        await using var conn = mySqlDataSource.CreateConnection();
-        await conn.OpenAsync(ct);
-
         const string sql = """
             INSERT INTO Users (Username, Email)
             VALUES (@Username, @Email);
         """;
 
-        await using var cmd = new MySqlCommand(sql, conn);
+        await using var cmd = new SqlCommand(sql, dataSource);
 
-        cmd.Parameters.Add("@Username", MySqlDbType.VarChar).Value = request.Username;
-        cmd.Parameters.Add("@Email", MySqlDbType.VarChar).Value = request.Email;
+        cmd.Parameters.Add(new SqlParameter("@Username", System.Data.SqlDbType.NVarChar)
+        {
+            Value = request.Username
+        });
+
+        cmd.Parameters.Add(new SqlParameter("@Email", System.Data.SqlDbType.NVarChar)
+        {
+            Value = request.Email
+        });
 
         await cmd.ExecuteNonQueryAsync(ct);
     }
 
     public async Task<UserResponse?> GetUserAsync(GetUserRequest request, CancellationToken ct)
     {
-        await using var conn = mySqlDataSource.CreateConnection();
-        await conn.OpenAsync(ct);
-
         const string sql = """
-            SELECT Id, Username, Email
+            SELECT TOP 1 Id, Username, Email
             FROM Users
-            WHERE Username = @Username
-            LIMIT 1;
+            WHERE Username = @Username;
         """;
 
-        await using var cmd = new MySqlCommand(sql, conn);
-        cmd.Parameters.Add("@Username", MySqlDbType.VarChar).Value = request.Username;
+        await using var cmd = new SqlCommand(sql, dataSource);
+
+        cmd.Parameters.Add(new SqlParameter("@Username", System.Data.SqlDbType.NVarChar)
+        {
+            Value = request.Username
+        });
 
         await using var reader = await cmd.ExecuteReaderAsync(ct);
 
         if (await reader.ReadAsync(ct))
         {
             return new UserResponse(
-                Id: reader.GetInt32("Id"),
-                Username: reader.GetString("Username"),
-                Email: reader.GetString("Email")
+                Id: reader.GetInt32(reader.GetOrdinal("Id")),
+                Username: reader.GetString(reader.GetOrdinal("Username")),
+                Email: reader.GetString(reader.GetOrdinal("Email"))
             );
         }
 

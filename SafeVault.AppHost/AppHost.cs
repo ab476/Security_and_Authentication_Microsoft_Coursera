@@ -1,15 +1,14 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var mysql = builder.AddMySql("mysql")
-                   .WithPhpMyAdmin()
+var sql = builder.AddSqlServer("sql")
                    .WithLifetime(ContainerLifetime.Persistent)
                    .WithDataVolume();
 
-var mysqldb = mysql.AddDatabase("mysqldb");
+var database = sql.AddDatabase("safevaultdb");
 
 
 builder.AddProject<Projects.SafeVault>("safevault")
-    .WithReference(mysqldb)
-    .WaitFor(mysqldb);
+    .WithReference(database)
+    .WaitFor(database);
 
 builder.Build().Run();
